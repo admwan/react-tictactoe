@@ -1,5 +1,8 @@
 import { useState } from 'react';
 
+var count_calculate_winner = 0;
+var moves_count =0;
+
 function Square({ value, onSquareClick }) {
   return (
     <button className="square" onClick={onSquareClick}>
@@ -10,25 +13,31 @@ function Square({ value, onSquareClick }) {
 
 function Board({ xIsNext, squares, onPlay }) {
   function handleClick(i) {
+	console.log("handleClick() clalled with argument i: " +i);
+	moves_count++;
     if (calculateWinner(squares) || squares[i]) {
       return;
     }
     const nextSquares = squares.slice();
     if (xIsNext) {
-      nextSquares[i] = 'X';
+      nextSquares[i] = 'Z';
     } else {
-      nextSquares[i] = 'O';
+      nextSquares[i] = 'Q';
     }
     onPlay(nextSquares);
   }
 
   const winner = calculateWinner(squares);
   let status;
+  console.log("moves_count:" + moves_count);
   if (winner) {
     status = 'Winner: ' + winner;
+  } else if (moves_count < 9){
+    status = 'Next player: ' + (xIsNext ? 'Z' : 'Q');
   } else {
-    status = 'Next player: ' + (xIsNext ? 'X' : 'O');
+	status = 'NO Winner!'
   }
+  console.log("Rewriting DOM");
 
   return (
     <>
@@ -95,6 +104,8 @@ export default function Game() {
 }
 
 function calculateWinner(squares) {
+	count_calculate_winner++;
+	console.log("count_calculate_winner:" + count_calculate_winner);
   const lines = [
     [0, 1, 2],
     [3, 4, 5],
@@ -107,7 +118,7 @@ function calculateWinner(squares) {
   ];
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+    if (squares[a] && (squares[a] === squares[b]) && (squares[a] === squares[c])) {
       return squares[a];
     }
   }
