@@ -1,8 +1,5 @@
 import { useState } from 'react';
 
-var count_calculate_winner = 0;
-var moves_count =0;
-
 function Square({ value, onSquareClick }) {
   return (
     <button className="square" onClick={onSquareClick}>
@@ -14,7 +11,6 @@ function Square({ value, onSquareClick }) {
 function Board({ xIsNext, squares, onPlay }) {
   function handleClick(i) {
 	console.log("handleClick() clalled with argument i: " +i);
-	moves_count++;
     if (calculateWinner(squares) || squares[i]) {
       return;
     }
@@ -28,16 +24,17 @@ function Board({ xIsNext, squares, onPlay }) {
   }
 
   const winner = calculateWinner(squares);
+  const endOfPlay = boardFull(squares);
   let status;
-  console.log("moves_count:" + moves_count);
   if (winner) {
     status = 'Winner: ' + winner;
-  } else if (moves_count < 9){
+  } else if (endOfPlay === false){
     status = 'Next player: ' + (xIsNext ? 'Z' : 'Q');
   } else {
 	status = 'NO Winner!'
   }
-  console.log("Rewriting DOM");
+ 
+   //console.log("Rewriting DOM");
 
   return (
     <>
@@ -79,11 +76,17 @@ export default function Game() {
 
   const moves = history.map((squares, move) => {
     let description;
-    if (move > 0) {
+    if ((move > 0) && (move < 9)) {
+		console.log("move> 0 because move=" + move);
       description = 'Go to move #' + move;
-    } else {
+    } else if (move < 8) {
       description = 'Go to game start';
+	  console.log("move == 0, because move=" + move);
     }
+	else { 
+		console.log("End of game because move=" + move);
+		description = "End of Game";
+		}
     return (
       <li key={move}>
         <button onClick={() => jumpTo(move)}>{description}</button>
@@ -103,9 +106,8 @@ export default function Game() {
   );
 }
 
+
 function calculateWinner(squares) {
-	count_calculate_winner++;
-	console.log("count_calculate_winner:" + count_calculate_winner);
   const lines = [
     [0, 1, 2],
     [3, 4, 5],
@@ -123,4 +125,12 @@ function calculateWinner(squares) {
     }
   }
   return null;
+}
+
+function boardFull(squares) {
+	for (let i = 0; i < squares.length; i++) {
+		if(squares[i] === null)
+			return false;
+		}
+	 return true;
 }
